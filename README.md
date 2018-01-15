@@ -1,5 +1,7 @@
 # Attendance Portal
 
+Link to API documentation: [API Documentation](https://documenter.getpostman.com/view/1374736/attendance-portal/6Z6rVmM)
+
 ## Set up the project
 ##### For Ubuntu and Debian-based systems
 
