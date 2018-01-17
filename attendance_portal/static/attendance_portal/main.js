@@ -134,11 +134,8 @@ $('button#student.btn.btn-success.login').click(function () {
         url: 'https://attendance-portal.herokuapp.com/api/login',
         data: {
             'userType': $(this).attr('id'),
-            'userName': $('input#studentUsername').val(),
-            'password': $('input#studentPassword').val(),
-            'firstName': 'Harshit',
-            'lastName': 'Jain',
-            'email': 'iit2016060@iiita.ac.in'
+            'userName': $('input#studentUsername').val().trim(),
+            'password': $('input#studentPassword').val().trim()
         },
         success: function (data) {
             localStorage.setItem('authToken', data.authToken);
@@ -146,7 +143,7 @@ $('button#student.btn.btn-success.login').click(function () {
             window.location.href = "https://attendance-portal.herokuapp.com/student";
         },
         error: function (error) {
-            console.log(error);
+            alert(error.responseJSON.message)
         }
     })
 });
@@ -158,11 +155,8 @@ $('button#professor.btn.btn-success.login').click(function () {
         url: 'https://attendance-portal.herokuapp.com/api/login',
         data: {
             'userType': $(this).attr('id'),
-            'userName': $('input#professorUsername').val(),
-            'password': $('input#professorPassword').val(),
-            'firstName': 'Doctor',
-            'lastName': 'Who',
-            'email': 'drwho@find.me.com'
+            'userName': $('input#professorUsername').val().trim(),
+            'password': $('input#professorPassword').val().trim()
         },
         success: function (data) {
             localStorage.setItem('authToken', data.authToken);
@@ -170,7 +164,7 @@ $('button#professor.btn.btn-success.login').click(function () {
             window.location.href = "https://attendance-portal.herokuapp.com/professor";
         },
         error: function (error) {
-            console.log(error);
+            alert(error.responseJSON.message)
         }
     })
 });
@@ -192,7 +186,7 @@ $('button#add-course-professor.btn.btn-success').click(function() {
         },
         url: "https://attendance-portal.herokuapp.com/api/faculty/course",
         data: {
-            "course": $('input#add-course-courseId.form-control').val()
+            "course": $('input#add-course-courseId.form-control').val().trim()
         },
         success: function (data) {
             alert(data.responseText);
@@ -213,7 +207,7 @@ $('button#remove-course-professor.btn.btn-danger').click(function() {
         },
         url: "https://attendance-portal.herokuapp.com/api/faculty/course",
         data: {
-            "course": $('input#add-course-courseId.form-control').val()
+            "course": $('input#add-course-courseId.form-control').val().trim()
         },
         success: function (data) {
             alert(data.responseText);
@@ -234,9 +228,9 @@ $('button#add-course-student.btn.btn-success').click(function() {
         },
         url: "https://attendance-portal.herokuapp.com/api/student/course",
         data: {
-            "course": $('input#add-course-courseId.form-control').val(),
-            "semester": $('input#add-course-semester.form-control').val(),
-            "section": $('input#add-course-section.form-control').val()
+            "course": $('input#add-course-courseId.form-control').val().trim(),
+            "semester": $('input#add-course-semester.form-control').val().trim(),
+            "section": $('input#add-course-section.form-control').val().trim()
         },
         success: function (data) {
             alert(data);
@@ -257,9 +251,9 @@ $('button#remove-course-student.btn.btn-danger').click(function() {
         },
         url: "https://attendance-portal.herokuapp.com/api/student/course",
         data: {
-            "course": $('input#add-course-courseId.form-control').val(),
-            "semester": $('input#add-course-semester.form-control').val(),
-            "section": $('input#add-course-section.form-control').val()
+            "course": $('input#add-course-courseId.form-control').val().trim(),
+            "semester": $('input#add-course-semester.form-control').val().trim(),
+            "section": $('input#add-course-section.form-control').val().trim()
         },
         success: function (data) {
             console.log(data);
@@ -282,26 +276,24 @@ $('button#update-student.btn.btn-success').click(function() {
         },
         url: "https://attendance-portal.herokuapp.com/api/students",
         data: {
-            "name": $('input#student-name.form-control').val(),
-            "email": $('input#student-email.form-control').val(),
-            "currentSemester": $('input#student-semester.form-control').val(),
-            "graduationYear": $('input#student-graduation-year.form-control').val()
+            "name": $('input#student-name.form-control').val().trim(),
+            "email": $('input#student-email.form-control').val().trim(),
+            "currentSemester": $('input#student-semester.form-control').val().trim(),
+            "graduationYear": $('input#student-graduation-year.form-control').val().trim()
         },
         success: function (data) {
-            console.log(data);
             alert(data);
         },
         error: function (error) {
-            console.log(error);
             alert(error.responseText);
         }
     })
 });
 
 $('button#course-attendance.btn.btn-primary').on('click', function () {
-    let course = $('input#attendance-courseId.form-control').val();
-    let section = $('input#attendance-section.form-control').val();
-    let month = $('input#attendance-month.form-control').val();
+    let course = $('input#attendance-courseId.form-control').val().trim();
+    let section = $('input#attendance-section.form-control').val().trim();
+    let month = $('input#attendance-month.form-control').val().trim();
     $('div#course-attendance-wrapper.container.table-responsive.table-hover').empty();
 
     var loader = document.createElement('div');
@@ -384,8 +376,8 @@ $('button#increase-token.btn.btn-primary').click(function () {
         },
         url: "https://attendance-portal.herokuapp.com/api/attendance-tokens",
         data: {
-            "token": $('input#attendance-token.form-control').val(),
-            "increaseBy": $('input#attendance-count.form-control').val()
+            "token": $('input#attendance-token.form-control').val().trim(),
+            "increaseBy": $('input#attendance-count.form-control').val().trim()
         },
         success: function (data) {
             $(this).addClass("disable");
@@ -419,7 +411,7 @@ $('button#getTokens').click(function () {
         noOfLectures = 2;
     }
 
-    var dateTime = $('input#datetimepicker5.form-control').val();
+    var dateTime = $('input#datetimepicker5.form-control').val().trim();
     var date = dateTime.split(" ")[0].split("/").reverse().join("-");
     var time = dateTime.split(" ")[1];
     var hours = time.split(":")[0];
@@ -437,23 +429,23 @@ $('button#getTokens').click(function () {
     // console.log(time);
     // console.log(noOfLectures);
     // console.log(lectureType);
-    // console.log($('input#section.form-control').val().toUpperCase());
-    // console.log($('input#courseId.form-control').val());
-    // console.log($('input#totalStudents.form-control').val());
-    // console.log($('input#token.form-control').val());
+    // console.log($('input#section.form-control').val().trim().toUpperCase());
+    // console.log($('input#courseId.form-control').val().trim());
+    // console.log($('input#totalStudents.form-control').val().trim());
+    // console.log($('input#token.form-control').val().trim());
     $.ajax({
         type: 'POST',
         dataType: 'json',
         url: 'https://attendance-portal.herokuapp.com/api/attendance-tokens',
         data: {
-            "course": $('input#courseId.form-control').val(),
-            'section': $('input#section.form-control').val().toUpperCase(),
+            "course": $('input#courseId.form-control').val().trim(),
+            'section': $('input#section.form-control').val().trim().toUpperCase(),
             'date': date,
             'time': time,
             'noOfLectures': noOfLectures,
             'lectureType': lectureType,
-            'totalStudents': $('input#totalStudents.form-control').val(),
-            'noOfTokens': $('input#token.form-control').val()
+            'totalStudents': $('input#totalStudents.form-control').val().trim(),
+            'noOfTokens': $('input#token.form-control').val().trim()
         },
         headers: {
             'authorization-token': globalObject.authToken
@@ -469,7 +461,7 @@ $('button#getTokens').click(function () {
 
         },
         error: function (error) {
-            alert(error.responseText);
+            alert(error.responseJSON.message);
         }
     });
 });
@@ -480,20 +472,18 @@ $('button#mark-attendance.btn.btn-success').click(function () {
         dataType: 'json',
         url: 'https://attendance-portal.herokuapp.com/api/attendance/student',
         data: {
-            'attendanceToken': $('input#token.form-control').val(),
-            'course': $('input#course.form-control').val(),
+            'attendanceToken': $('input#token.form-control').val().trim(),
+            'course': $('input#course.form-control').val().trim(),
             'rating': ratingMap[globalObject.lectureRating],
-            'feedback': $('input#feedback.form-control').val()
+            'feedback': $('input#feedback.form-control').val().trim()
         },
         headers: {
             'authorization-token': globalObject.authToken
         },
         success: function (data) {
-            console.log(data);
             alert(data);
         },
         error: function (error) {
-            console.log(error);
             alert(error.responseText);
         }
     });
