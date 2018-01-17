@@ -12,6 +12,8 @@ from django.utils.crypto import get_random_string
 from datetime import timedelta, datetime
 from .permissions import *
 from .helper_functions import *
+import requests
+import json
 
 
 class UserLoginView(APIView):
@@ -26,16 +28,22 @@ class UserLoginView(APIView):
         else:
             username = request.data['userName'].lower()
             password = request.data['password']
-            # NOTE The following code is only meant for development purposes until ldap login function is tested against
-            # the university ldap server.
-            # When the function is battle-tested, uncomment the following line and comment out statement after that
-            # is_user = authenticate_user(username, password, user_type)
-            is_user = password == "pass"
-            first_name = request.data['firstName']
-            last_name = request.data['lastName']
-            email = request.data['email']
+
+            user_info = requests.post("https://geekhaven.iiita.ac.in/attendance-portal/",
+                                      data={
+                                          "roll": username,
+                                          "pass": password,
+                                          "type": user_type
+                                      })
+
+            payload = json.loads(user_info.content)
+
+            is_user = payload['status'] == 200
 
             if is_user:
+                (first_name, last_name) = payload['name'].capitalize().split()
+                email = username + "@iiita.ac.in"
+
                 auth_token = get_random_string(length=64,
                                                allowed_chars=u'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
                 if user_type == 'professor':
@@ -114,7 +122,7 @@ class StudentCourseView(APIView):
     def put(self, request):
         semester = request.data['semester']
         course = request.data['course']
-        section = request.data['section'].upper();
+        section = request.data['section'].upper()
         student = request.user
         student.current_semester = semester
         student.save()
