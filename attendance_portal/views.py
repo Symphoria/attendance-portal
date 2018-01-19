@@ -18,62 +18,64 @@ import json
 
 class UserLoginView(APIView):
     def post(self, request):
-        user_type = request.data['userType']
+        user_type = str(request.data['userType'])
 
-        if 'HTTP_AUTHORIZATION_TOKEN' in request.META and Session.objects.filter(
-                auth_token=request.META['HTTP_AUTHORIZATION_TOKEN'],
-                expires_at__gte=datetime.now(),
-                user_type=user_type).exists():
-            return Response({"message": "User already logged in"}, status=status.HTTP_200_OK)
-        else:
-            username = request.data['userName'].lower()
-            password = request.data['password']
+        # if 'HTTP_AUTHORIZATION_TOKEN' in request.META and Session.objects.filter(
+        #         auth_token=request.META['HTTP_AUTHORIZATION_TOKEN'],
+        #         expires_at__gte=datetime.now(),
+        #         user_type=user_type).exists():
+        #     return Response({"message": "User already logged in"}, status=status.HTTP_200_OK)
+        # else:
+        username = str(request.data['userName']).lower()
+        password = str(request.data['password'])
 
-            user_info = requests.post("https://geekhaven.iiita.ac.in/attendance-portal/",
-                                      data={
-                                          "roll": username,
-                                          "pass": password,
-                                          "type": user_type
-                                      })
+        user_info = requests.post("https://geekhaven.iiita.ac.in/attendance-portal/",
+                                  json={
+                                      "roll": username,
+                                      "pass": password,
+                                      "type": user_type
+                                  }, headers={
+                                      "Content-Type": "application/json"
+                                  })
 
-            payload = json.loads(user_info.content)
+        user_info_obj = json.loads(user_info.content)
 
-            is_user = payload['status'] == 200
+        is_user = user_info_obj['status'] == 200
 
-            if is_user:
-                (first_name, last_name) = payload['name'].capitalize().split()
-                email = username + "@iiita.ac.in"
+        if is_user:
+            (first_name, last_name) = [x.capitalize() for x in user_info_obj['name'].split()]
+            email = username + "@iiita.ac.in"
 
-                auth_token = get_random_string(length=64,
-                                               allowed_chars=u'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
-                if user_type == 'professor':
-                    user = Professor.objects.filter(professor_id=username).first()
-                    if user:
-                        user_id = user.id
-                    else:
-                        new_user = Professor.objects.create(professor_id=username, first_name=first_name,
-                                                            last_name=last_name, email=email)
-                        user_id = new_user.id
+            auth_token = get_random_string(length=64,
+                                           allowed_chars=u'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
+            if user_type == 'professor':
+                user = Professor.objects.filter(professor_id=username).first()
+                if user:
+                    user_id = user.id
                 else:
-                    user = Student.objects.filter(enrollment_no=username).first()
-                    if user is not None:
-                        user_id = user.id
-                    else:
-                        new_user = Student.objects.create(enrollment_no=username, first_name=first_name,
-                                                          last_name=last_name, email=email, is_active=True)
-                        user_id = new_user.id
-
-                Session.objects.create(auth_token=auth_token, user_id=user_id, user_type=user_type,
-                                       expires_at=timezone.now() + timedelta(hours=4))
-                payload = {
-                    "authToken": auth_token,
-                    "userId": username,
-                    "userType": user_type
-                }
-
-                return Response(payload, status=status.HTTP_200_OK)
+                    new_user = Professor.objects.create(professor_id=username, first_name=first_name,
+                                                        last_name=last_name, email=email)
+                    user_id = new_user.id
             else:
-                return Response({"message": "Given Credentials are wrong"}, status=status.HTTP_400_BAD_REQUEST)
+                user = Student.objects.filter(enrollment_no=username).first()
+                if user is not None:
+                    user_id = user.id
+                else:
+                    new_user = Student.objects.create(enrollment_no=username, first_name=first_name,
+                                                      last_name=last_name, email=email, is_active=True)
+                    user_id = new_user.id
+
+            Session.objects.create(auth_token=auth_token, user_id=user_id, user_type=user_type,
+                                   expires_at=timezone.now() + timedelta(hours=4))
+            payload = {
+                "authToken": auth_token,
+                "userId": username,
+                "userType": user_type
+            }
+
+            return Response(payload, status=status.HTTP_200_OK)
+        else:
+            return Response({"message": "Given Credentials are wrong"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class StudentView(APIView):

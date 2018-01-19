@@ -54,6 +54,8 @@ let d = new Date();
 let m = d.getMonth() + 1;
 globalObject.currentMonth = m;
 
+const baseApiUrl = "https://attendance-portal.herokuapp.com";
+
 function getStudentCourses() {
     $('div#course-wrapper').empty();
 
@@ -67,7 +69,7 @@ function getStudentCourses() {
         headers: {
             'authorization-token': globalObject.authToken
         },
-        url: 'https://attendance-portal.herokuapp.com/api/students',
+        url: baseApiUrl + '/api/students',
         success: function (data) {
             $('div#course-wrapper').empty();
             data.coursesTaken.forEach(function (element) {
@@ -97,7 +99,7 @@ function getProfessorCourses() {
         headers: {
             'authorization-token': globalObject.authToken
         },
-        url: "https://attendance-portal.herokuapp.com/api/faculty/course",
+        url: baseApiUrl + "/api/faculty/course",
         success: function (data) {
             $('div#course-wrapper').empty();
 
@@ -131,7 +133,7 @@ $('button#student.btn.btn-success.login').click(function () {
     $.ajax({
         type: 'POST',
         dataType: 'json',
-        url: 'https://attendance-portal.herokuapp.com/api/login',
+        url: baseApiUrl + '/api/login',
         data: {
             'userType': $(this).attr('id'),
             'userName': $('input#studentUsername').val().trim(),
@@ -140,7 +142,7 @@ $('button#student.btn.btn-success.login').click(function () {
         success: function (data) {
             localStorage.setItem('authToken', data.authToken);
             globalObject.authToken = data.authToken;
-            window.location.href = "https://attendance-portal.herokuapp.com/student";
+            window.location.href = baseApiUrl + "/student";
         },
         error: function (error) {
             alert(error.responseJSON.message)
@@ -152,7 +154,7 @@ $('button#professor.btn.btn-success.login').click(function () {
     $.ajax({
         type: 'POST',
         dataType: 'json',
-        url: 'https://attendance-portal.herokuapp.com/api/login',
+        url: baseApiUrl + '/api/login',
         data: {
             'userType': $(this).attr('id'),
             'userName': $('input#professorUsername').val().trim(),
@@ -161,7 +163,7 @@ $('button#professor.btn.btn-success.login').click(function () {
         success: function (data) {
             localStorage.setItem('authToken', data.authToken);
             globalObject.authToken = data.authToken;
-            window.location.href = "https://attendance-portal.herokuapp.com/professor";
+            window.location.href = baseApiUrl + "/professor";
         },
         error: function (error) {
             alert(error.responseJSON.message)
@@ -184,7 +186,7 @@ $('button#add-course-professor.btn.btn-success').click(function() {
         headers: {
             'authorization-token': globalObject.authToken
         },
-        url: "https://attendance-portal.herokuapp.com/api/faculty/course",
+        url: baseApiUrl + "/api/faculty/course",
         data: {
             "course": $('input#add-course-courseId.form-control').val().trim()
         },
@@ -205,7 +207,7 @@ $('button#remove-course-professor.btn.btn-danger').click(function() {
         headers: {
             'authorization-token': globalObject.authToken
         },
-        url: "https://attendance-portal.herokuapp.com/api/faculty/course",
+        url: baseApiUrl + "/api/faculty/course",
         data: {
             "course": $('input#add-course-courseId.form-control').val().trim()
         },
@@ -226,7 +228,7 @@ $('button#add-course-student.btn.btn-success').click(function() {
         headers: {
             'authorization-token': globalObject.authToken
         },
-        url: "https://attendance-portal.herokuapp.com/api/student/course",
+        url: baseApiUrl + "/api/student/course",
         data: {
             "course": $('input#add-course-courseId.form-control').val().trim(),
             "semester": $('input#add-course-semester.form-control').val().trim(),
@@ -249,7 +251,7 @@ $('button#remove-course-student.btn.btn-danger').click(function() {
         headers: {
             'authorization-token': globalObject.authToken
         },
-        url: "https://attendance-portal.herokuapp.com/api/student/course",
+        url: baseApiUrl + "/api/student/course",
         data: {
             "course": $('input#add-course-courseId.form-control').val().trim(),
             "semester": $('input#add-course-semester.form-control').val().trim(),
@@ -274,7 +276,7 @@ $('button#update-student.btn.btn-success').click(function() {
         headers: {
             'authorization-token': globalObject.authToken
         },
-        url: "https://attendance-portal.herokuapp.com/api/students",
+        url: baseApiUrl + "/api/students",
         data: {
             "name": $('input#student-name.form-control').val().trim(),
             "email": $('input#student-email.form-control').val().trim(),
@@ -306,7 +308,7 @@ $('button#course-attendance.btn.btn-primary').on('click', function () {
         headers: {
             'authorization-token': globalObject.authToken
         },
-        url: "https://attendance-portal.herokuapp.com/api/attendance/course?course=" + course + "&section=" + section + "&month=" + month,
+        url: baseApiUrl + "/api/attendance/course?course=" + course + "&section=" + section + "&month=" + month,
         success: function (data) {
             $('h3#down-error-message').text("");
             let htmlString = `<center><h3>` + course.toUpperCase() + `</h3></center><center><h4>` + data.rating + `</h4></center>
@@ -374,7 +376,7 @@ $('button#increase-token.btn.btn-primary').click(function () {
         headers: {
             'authorization-token': globalObject.authToken
         },
-        url: "https://attendance-portal.herokuapp.com/api/attendance-tokens",
+        url: baseApiUrl + "/api/attendance-tokens",
         data: {
             "token": $('input#attendance-token.form-control').val().trim(),
             "increaseBy": $('input#attendance-count.form-control').val().trim()
@@ -436,7 +438,7 @@ $('button#getTokens').click(function () {
     $.ajax({
         type: 'POST',
         dataType: 'json',
-        url: 'https://attendance-portal.herokuapp.com/api/attendance-tokens',
+        url: baseApiUrl + '/api/attendance-tokens',
         data: {
             "course": $('input#courseId.form-control').val().trim(),
             'section': $('input#section.form-control').val().trim().toUpperCase(),
@@ -470,7 +472,7 @@ $('button#mark-attendance.btn.btn-success').click(function () {
     $.ajax({
         type: 'PUT',
         dataType: 'json',
-        url: 'https://attendance-portal.herokuapp.com/api/attendance/student',
+        url: baseApiUrl + '/api/attendance/student',
         data: {
             'attendanceToken': $('input#token.form-control').val().trim(),
             'course': $('input#course.form-control').val().trim(),
@@ -497,13 +499,13 @@ $('button#log-out.btn.btn-warning').click(function() {
     $.ajax({
         type: 'PUT',
         dataType: 'json',
-        url: 'https://attendance-portal.herokuapp.com/api/logout',
+        url: baseApiUrl + '/api/logout',
         headers: {
             'authorization-token': globalObject.authToken
         },
         success: function (data) {
             localStorage.removeItem('authToken');
-            window.location.replace("https://attendance-portal.herokuapp.com");
+            window.location.replace(baseApiUrl + "");
         },
         error: function (error) {
             alert(error.responseText);
@@ -522,7 +524,7 @@ $('#course-wrapper').on("click", "button.btn.btn-success.view-student-attendance
     $.ajax({
         type: 'GET',
         dataType: 'json',
-        url: "https://attendance-portal.herokuapp.com/api/attendance/student?course=" + $(this).attr("id"),
+        url: baseApiUrl + "/api/attendance/student?course=" + $(this).attr("id"),
         headers: {
             'authorization-token': globalObject.authToken
         },
@@ -566,7 +568,7 @@ $('#course-wrapper').on("click", "button.btn.btn-success.view-student-attendance
                 } else {
                     htmlString += `<h3 style="color: red;">Absent</h3></div></div></div></center></div>`;
                 }
-            })
+            });
 
             htmlString += `</div>
         </div>`;
